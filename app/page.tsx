@@ -23,21 +23,21 @@ export default function Home() {
         setColleges(data);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error(err);
+      .catch((error) => {
+        console.error(error);
         setLoading(false);
       });
   }, []);
 
   if (loading) {
-    return <h1 style={{ padding: "40px" }}>Loading colleges...</h1>;
+    return <h1 style={{ padding: "20px" }}>Loading colleges...</h1>;
   }
 
   return (
     <main
       style={{
-        padding: "40px",
-        backgroundColor: "#f5f7fa",
+        padding: "30px",
+        backgroundColor: "#f5f5f5",
         minHeight: "100vh",
       }}
     >
@@ -45,7 +45,6 @@ export default function Home() {
         style={{
           textAlign: "center",
           marginBottom: "30px",
-          fontSize: "36px",
         }}
       >
         🎓 College Discovery Platform
@@ -54,7 +53,7 @@ export default function Home() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
           gap: "20px",
         }}
       >
@@ -62,10 +61,10 @@ export default function Home() {
           <div
             key={college.id}
             style={{
-              background: "white",
-              borderRadius: "12px",
+              backgroundColor: "white",
               padding: "20px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+              borderRadius: "12px",
+              boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
             }}
           >
             <h2>{college.name}</h2>
@@ -86,14 +85,13 @@ export default function Home() {
               <strong>📈 Placement:</strong> {college.placement_percentage}%
             </p>
 
-            <div>
-              <strong>Courses:</strong>
-              <ul>
-                {college.courses.map((course, index) => (
-                  <li key={index}>{course}</li>
-                ))}
-              </ul>
-            </div>
+            <h4>Courses:</h4>
+
+            <ul>
+              {college.courses.map((course, index) => (
+                <li key={index}>{course}</li>
+              ))}
+            </ul>
           </div>
         ))}
       </div>
