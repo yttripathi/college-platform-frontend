@@ -1,9 +1,8 @@
-import type { Metadata } from "next";
 import "./globals.css";
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "College Discovery Platform",
-  description: "Find and compare colleges easily",
+  description: "College Finder",
 };
 
 export default function RootLayout({
