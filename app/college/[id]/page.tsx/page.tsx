@@ -1,60 +1,48 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import Link from "next/link";
 
-export default function CollegeDetail() {
-  const { id } = useParams();
-  const [college, setCollege] = useState<any>(null);
+type College = {
+  id: number;
+  name: string;
+  location: string;
+  fees: number;
+  rating: number;
+  placement_percentage: number;
+  courses: string[];
+};
+
+export default function Home() {
+  const [colleges, setColleges] = useState<College[]>([]);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/colleges`)
+    fetch("https://college-platform-backend-zrco.onrender.com/colleges")
       .then((res) => res.json())
-      .then((data) => {
-        const selectedCollege = data.find(
-          (c: any) => String(c.id) === String(id),
-        );
-        setCollege(selectedCollege);
-      });
-  }, [id]);
-
-  if (!college) {
-    return <div className="p-6">Loading...</div>;
-  }
+      .then((data) => setColleges(data))
+      .catch((err) => console.log(err));
+  }, []);
 
   return (
-    <main className="min-h-screen bg-gray-950 text-white p-8">
-      <Link href="/" className="text-blue-400">
-        ← Back to colleges
-      </Link>
+    <main style={{ padding: "40px" }}>
+      <h1>College Discovery Platform</h1>
 
-      <h1 className="text-3xl font-bold mt-6 mb-4">{college.name}</h1>
-
-      <div className="bg-gray-900 border border-gray-700 rounded-xl p-6">
-        <p>
-          <b>Location:</b> {college.location}
-        </p>
-        <p>
-          <b>Fees:</b> ₹{college.fees}
-        </p>
-        <p>
-          <b>Rating:</b> {college.rating}
-        </p>
-        <p>
-          <b>Placement:</b> {college.placement_percentage}%
-        </p>
-
-        <h2 className="text-xl font-bold mt-6">Courses</h2>
-        <ul className="list-disc ml-6">
-          <li>B.Tech CSE</li>
-          <li>B.Tech IT</li>
-          <li>B.Tech Mechanical</li>
-        </ul>
-
-        <h2 className="text-xl font-bold mt-6">Reviews</h2>
-        <p>⭐ Good placements and campus environment.</p>
-      </div>
+      {colleges.map((college) => (
+        <div
+          key={college.id}
+          style={{
+            border: "1px solid gray",
+            padding: "20px",
+            margin: "20px 0",
+          }}
+        >
+          <h2>{college.name}</h2>
+          <p>Location: {college.location}</p>
+          <p>Fees: ₹{college.fees}</p>
+          <p>Rating: {college.rating}</p>
+          <p>Placement: {college.placement_percentage}%</p>
+          <p>Courses: {college.courses.join(", ")}</p>
+        </div>
+      ))}
     </main>
   );
 }
