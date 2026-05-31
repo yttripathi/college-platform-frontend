@@ -1,7 +1,3 @@
-"use client";
-
-import { useEffect, useState } from "react";
-
 type College = {
   id: number;
   name: string;
@@ -9,93 +5,58 @@ type College = {
   fees: number;
   rating: number;
   placement_percentage: number;
-  courses: string[];
+  courses?: string[];
 };
 
-export default function Home() {
-  const [colleges, setColleges] = useState<College[]>([]);
-  const [loading, setLoading] = useState(true);
+async function getColleges(): Promise<College[]> {
+  const res = await fetch(
+    "https://college-platform-backend-zrco.onrender.com/colleges",
+    { cache: "no-store" },
+  );
 
-  useEffect(() => {
-    fetch("https://college-platform-backend-zrco.onrender.com/colleges")
-      .then((res) => res.json())
-      .then((data) => {
-        setColleges(data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
-  }, []);
+  return res.json();
+}
 
-  if (loading) {
-    return <h1 style={{ padding: "40px" }}>Loading colleges...</h1>;
+export default async function CollegeDetails({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const colleges = await getColleges();
+
+  const college = colleges.find((c) => c.id === Number(params.id));
+
+  if (!college) {
+    return <h1 style={{ padding: "40px" }}>College not found</h1>;
   }
 
   return (
     <main
-      style={{
-        padding: "40px",
-        backgroundColor: "#f5f7fa",
-        minHeight: "100vh",
-      }}
+      style={{ padding: "40px", background: "#f4f6f8", minHeight: "100vh" }}
     >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "30px",
-          fontSize: "36px",
-        }}
-      >
-        🎓 College Discovery Platform
-      </h1>
-
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))",
-          gap: "20px",
+          background: "white",
+          padding: "30px",
+          borderRadius: "14px",
+          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          maxWidth: "700px",
+          margin: "auto",
         }}
       >
-        {colleges.map((college) => (
-          <div
-            key={college.id}
-            style={{
-              background: "white",
-              borderRadius: "12px",
-              padding: "20px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            }}
-          >
-            <h2>{college.name}</h2>
+        <h1>{college.name}</h1>
 
-            <p>
-              <strong>📍 Location:</strong> {college.location}
-            </p>
+        <p>📍 Location: {college.location}</p>
+        <p>💰 Fees: ₹{college.fees}</p>
+        <p>⭐ Rating: {college.rating}</p>
+        <p>📈 Placement: {college.placement_percentage}%</p>
 
-            <p>
-              <strong>💰 Fees:</strong> ₹{college.fees}
-            </p>
-
-            <p>
-              <strong>⭐ Rating:</strong> {college.rating}
-            </p>
-
-            <p>
-              <strong>📈 Placement:</strong> {college.placement_percentage}%
-            </p>
-
-            <div>
-              <strong>Courses:</strong>
-              <ul>
-                {college.courses.map((course, index) => (
-                  <li key={index}>{course}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        ))}
+        <h3>Courses Offered</h3>
+        <ul>
+          {(college.courses || []).map((course, index) => (
+            <li key={index}>{course}</li>
+          ))}
+        </ul>
       </div>
     </main>
   );
