@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type College = {
   id: number;
   name: string;
@@ -23,7 +25,6 @@ export default async function CollegeDetails({
   params: { id: string };
 }) {
   const colleges = await getColleges();
-
   const college = colleges.find((c) => c.id === Number(params.id));
 
   if (!college) {
@@ -31,33 +32,46 @@ export default async function CollegeDetails({
   }
 
   return (
-    <main
-      style={{ padding: "40px", background: "#f4f6f8", minHeight: "100vh" }}
-    >
-      <div
-        style={{
-          background: "white",
-          padding: "30px",
-          borderRadius: "14px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          maxWidth: "700px",
-          margin: "auto",
-        }}
-      >
-        <h1>{college.name}</h1>
+    <main className="main">
+      <section className="hero">
+        <div>
+          <span className="badge">College Details</span>
+          <h1>{college.name}</h1>
+          <p>
+            Explore fees, placements, ratings and available courses for this
+            college.
+          </p>
 
-        <p>📍 Location: {college.location}</p>
-        <p>💰 Fees: ₹{college.fees}</p>
-        <p>⭐ Rating: {college.rating}</p>
-        <p>📈 Placement: {college.placement_percentage}%</p>
+          <div className="heroButtons">
+            <Link href="/">Back Home</Link>
+            <Link href="/compare">Compare Colleges</Link>
+          </div>
+        </div>
 
-        <h3>Courses Offered</h3>
-        <ul>
-          {(college.courses || []).map((course, index) => (
-            <li key={index}>{course}</li>
-          ))}
-        </ul>
-      </div>
+        <div className="heroCard">
+          <h2>{college.rating}⭐</h2>
+          <p>Student Rating</p>
+          <h2>{college.placement_percentage}%</h2>
+          <p>Placement Rate</p>
+        </div>
+      </section>
+
+      <section className="grid">
+        <div className="card">
+          <h2>College Overview</h2>
+          <p>📍 Location: {college.location}</p>
+          <p>💰 Fees: ₹{college.fees}</p>
+          <p>⭐ Rating: {college.rating}</p>
+          <p>📈 Placement: {college.placement_percentage}%</p>
+
+          <h3>Courses Offered</h3>
+          <div className="courses">
+            {(college.courses || []).map((course, index) => (
+              <span key={index}>{course}</span>
+            ))}
+          </div>
+        </div>
+      </section>
     </main>
   );
 }

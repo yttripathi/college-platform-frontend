@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type College = {
   id: number;
   name: string;
@@ -20,48 +22,59 @@ export default async function ComparePage() {
   const colleges = await getColleges();
 
   return (
-    <main
-      style={{ padding: "40px", background: "#f4f6f8", minHeight: "100vh" }}
-    >
-      <h1 style={{ textAlign: "center" }}>⚖️ Compare Colleges</h1>
+    <main className="main">
+      <section className="hero">
+        <div>
+          <span className="badge">Compare Colleges</span>
+          <h1>Choose smarter with side-by-side comparison</h1>
+          <p>Compare colleges by fees, location, rating and placements.</p>
 
-      <table
-        style={{
-          width: "100%",
-          background: "white",
-          borderCollapse: "collapse",
-          marginTop: "30px",
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-        }}
-      >
-        <thead>
-          <tr style={{ background: "#2563eb", color: "white" }}>
-            <th style={cell}>College</th>
-            <th style={cell}>Location</th>
-            <th style={cell}>Fees</th>
-            <th style={cell}>Rating</th>
-            <th style={cell}>Placement</th>
-          </tr>
-        </thead>
+          <div className="heroButtons">
+            <Link href="/">Back Home</Link>
+          </div>
+        </div>
+      </section>
 
-        <tbody>
-          {colleges.map((college) => (
-            <tr key={college.id}>
-              <td style={cell}>{college.name}</td>
-              <td style={cell}>{college.location}</td>
-              <td style={cell}>₹{college.fees}</td>
-              <td style={cell}>{college.rating}</td>
-              <td style={cell}>{college.placement_percentage}%</td>
+      <section style={{ width: "84%", margin: "40px auto", overflowX: "auto" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            background: "white",
+            borderRadius: "18px",
+            overflow: "hidden",
+            boxShadow: "0 14px 35px rgba(17, 24, 39, 0.1)",
+          }}
+        >
+          <thead>
+            <tr style={{ background: "#4f46e5", color: "white" }}>
+              <th style={cell}>College</th>
+              <th style={cell}>Location</th>
+              <th style={cell}>Fees</th>
+              <th style={cell}>Rating</th>
+              <th style={cell}>Placement</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {colleges.map((college) => (
+              <tr key={college.id}>
+                <td style={cell}>{college.name}</td>
+                <td style={cell}>{college.location}</td>
+                <td style={cell}>₹{college.fees}</td>
+                <td style={cell}>{college.rating}</td>
+                <td style={cell}>{college.placement_percentage}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
     </main>
   );
 }
 
 const cell = {
-  padding: "14px",
-  border: "1px solid #ddd",
+  padding: "16px",
+  border: "1px solid #e5e7eb",
   textAlign: "left" as const,
 };

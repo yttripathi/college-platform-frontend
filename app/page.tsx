@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 type College = {
@@ -17,6 +17,7 @@ export default function Home() {
   const [colleges, setColleges] = useState<College[]>([]);
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState("");
+  const [sort, setSort] = useState("rating");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,115 +30,129 @@ export default function Home() {
       .catch(() => setLoading(false));
   }, []);
 
-  const filteredColleges = colleges.filter((college) => {
-    const matchName = college.name.toLowerCase().includes(search.toLowerCase());
-    const matchLocation =
-      location === "" ||
-      college.location.toLowerCase().includes(location.toLowerCase());
+  const filteredColleges = useMemo(() => {
+    let result = colleges.filter((college) => {
+      const matchName = college.name
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      const matchLocation =
+        location === "" ||
+        college.location.toLowerCase().includes(location.toLowerCase());
 
-    return matchName && matchLocation;
-  });
+      return matchName && matchLocation;
+    });
+
+    if (sort === "rating") {
+      result = [...result].sort((a, b) => b.rating - a.rating);
+    }
+
+    if (sort === "fees") {
+      result = [...result].sort((a, b) => a.fees - b.fees);
+    }
+
+    if (sort === "placement") {
+      result = [...result].sort(
+        (a, b) => b.placement_percentage - a.placement_percentage,
+      );
+    }
+
+    return result;
+  }, [colleges, search, location, sort]);
 
   if (loading) {
-    return <h1 style={{ padding: "40px" }}>Loading colleges...</h1>;
+    return <h1 className="loading">Loading colleges...</h1>;
   }
 
   return (
-    <main
-      style={{ padding: "40px", background: "#f4f6f8", minHeight: "100vh" }}
-    >
-      <h1 style={{ textAlign: "center", fontSize: "36px" }}>
-        🎓 College Discovery Platform
-      </h1>
+    <main className="main">
+      <section className="hero">
+        <div>
+          <span className="badge">India’s Smart College Finder</span>
+          <h1>Find your dream college with confidence</h1>
+          <p>
+            Search colleges, compare fees, ratings, placements and courses in
+            one simple platform.
+          </p>
 
-      <p style={{ textAlign: "center", marginBottom: "30px" }}>
-        Search, explore and compare colleges easily
-      </p>
+          <div className="heroButtons">
+            <a href="#colleges">Explore Colleges</a>
+            <Link href="/compare">Compare Now</Link>
+          </div>
+        </div>
 
-      <div style={{ display: "flex", gap: "15px", marginBottom: "30px" }}>
+        <div className="heroCard">
+          <h2>🎓 3+</h2>
+          <p>Verified Colleges</p>
+          <h2>📈 85%</h2>
+          <p>Top Placement Rate</p>
+        </div>
+      </section>
+
+      <section className="stats">
+        <div>
+          <h3>{colleges.length}+</h3>
+          <p>Colleges</p>
+        </div>
+        <div>
+          <h3>4.3⭐</h3>
+          <p>Top Rating</p>
+        </div>
+        <div>
+          <h3>₹90k+</h3>
+          <p>Fees Range</p>
+        </div>
+      </section>
+
+      <section className="filters" id="colleges">
         <input
           type="text"
-          placeholder="Search college name..."
+          placeholder="Search by college name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "12px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
         />
 
         <input
           type="text"
-          placeholder="Filter by location..."
+          placeholder="Filter by city..."
           value={location}
           onChange={(e) => setLocation(e.target.value)}
-          style={{
-            flex: 1,
-            padding: "12px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-          }}
         />
 
-        <Link
-          href="/compare"
-          style={{
-            background: "#2563eb",
-            color: "white",
-            padding: "12px 20px",
-            borderRadius: "8px",
-            textDecoration: "none",
-          }}
-        >
-          Compare
-        </Link>
-      </div>
+        <select value={sort} onChange={(e) => setSort(e.target.value)}>
+          <option value="rating">Sort by Rating</option>
+          <option value="fees">Sort by Lowest Fees</option>
+          <option value="placement">Sort by Placement</option>
+        </select>
+      </section>
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-          gap: "20px",
-        }}
-      >
+      <section className="grid">
         {filteredColleges.map((college) => (
-          <div
-            key={college.id}
-            style={{
-              background: "white",
-              padding: "22px",
-              borderRadius: "14px",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            }}
-          >
+          <div className="card" key={college.id}>
+            <div className="cardTop">
+              <span>🎓</span>
+              <p>{college.location}</p>
+            </div>
+
             <h2>{college.name}</h2>
 
-            <p>📍 Location: {college.location}</p>
-            <p>💰 Fees: ₹{college.fees}</p>
-            <p>⭐ Rating: {college.rating}</p>
-            <p>📈 Placement: {college.placement_percentage}%</p>
+            <div className="info">
+              <p>💰 ₹{college.fees}</p>
+              <p>⭐ {college.rating}</p>
+              <p>📈 {college.placement_percentage}% Placement</p>
+            </div>
 
-            <p>
-              <strong>Courses:</strong>{" "}
-              {(college.courses || []).join(", ") || "Not available"}
-            </p>
+            <div className="courses">
+              {(college.courses || []).map((course, index) => (
+                <span key={index}>{course}</span>
+              ))}
+            </div>
 
-            <Link
-              href={`/college/${college.id}`}
-              style={{
-                display: "inline-block",
-                marginTop: "10px",
-                color: "#2563eb",
-                fontWeight: "bold",
-              }}
-            >
+            <Link href={`/college/${college.id}`} className="detailsBtn">
               View Details →
             </Link>
           </div>
         ))}
-      </div>
+      </section>
     </main>
   );
 }
