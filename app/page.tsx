@@ -9,51 +9,39 @@ type College = {
   fees: number;
   rating: number;
   placement_percentage: number;
-  courses: string[];
+  courses?: string[];
 };
 
 export default function Home() {
   const [colleges, setColleges] = useState<College[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("https://college-platform-backend-zrco.onrender.com/colleges")
       .then((res) => res.json())
       .then((data) => {
-        setColleges(data);
-        setLoading(false);
+        console.log("College data:", data);
+        setColleges(Array.isArray(data) ? data : []);
       })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
+      .catch(() => {
+        setError("Backend connected but college data could not load.");
       });
   }, []);
 
-  if (loading) {
-    return <h1 style={{ padding: "20px" }}>Loading colleges...</h1>;
-  }
-
   return (
     <main
-      style={{
-        padding: "30px",
-        backgroundColor: "#f5f5f5",
-        minHeight: "100vh",
-      }}
+      style={{ padding: "40px", minHeight: "100vh", background: "#f4f6f8" }}
     >
-      <h1
-        style={{
-          textAlign: "center",
-          marginBottom: "30px",
-        }}
-      >
-        🎓 College Discovery Platform
-      </h1>
+      <h1 style={{ textAlign: "center" }}>🎓 College Discovery Platform</h1>
+
+      {error && <h2 style={{ color: "red" }}>{error}</h2>}
+
+      {colleges.length === 0 && !error && <h2>No colleges found</h2>}
 
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
           gap: "20px",
         }}
       >
@@ -61,34 +49,29 @@ export default function Home() {
           <div
             key={college.id}
             style={{
-              backgroundColor: "white",
+              background: "white",
               padding: "20px",
               borderRadius: "12px",
-              boxShadow: "0px 2px 10px rgba(0,0,0,0.1)",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
             }}
           >
             <h2>{college.name}</h2>
-
             <p>
-              <strong>📍 Location:</strong> {college.location}
+              <b>📍 Location:</b> {college.location}
             </p>
-
             <p>
-              <strong>💰 Fees:</strong> ₹{college.fees}
+              <b>💰 Fees:</b> ₹{college.fees}
             </p>
-
             <p>
-              <strong>⭐ Rating:</strong> {college.rating}
+              <b>⭐ Rating:</b> {college.rating}
             </p>
-
             <p>
-              <strong>📈 Placement:</strong> {college.placement_percentage}%
+              <b>📈 Placement:</b> {college.placement_percentage}%
             </p>
 
             <h4>Courses:</h4>
-
             <ul>
-              {college.courses.map((course, index) => (
+              {(college.courses || []).map((course, index) => (
                 <li key={index}>{course}</li>
               ))}
             </ul>
